@@ -1,0 +1,118 @@
+.ski-body {
+    background-image: url('assets/snowy.mountain.jpeg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: lightyellow !important;
+    padding: 20px;
+    text-align: center;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 24px;
+}
+
+.ski-body li {
+    text-align: center;
+    list-style-position: inside;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 100px;
+    color: #4A4E69;
+    border: 2px solid lightbrown;
+    background-color: #f5f5dc;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+a:link {
+    color: #69ffdf;
+}
+
+a:visited {
+    color: #ffd26a;
+}
+
+a:hover {
+    color: #00ffe5;
+}
+
+a:active {
+    color: #ffff00;
+}
+
+.media-border {
+    display: inline-block;
+    border: 3px solid white;
+    padding: 10px;
+    margin: 20px 0;
+    border-radius: 10px;
+    width: 40%;
+    text-align: center;
+    margin-left: 20px;
+}
+
+.media-border img {
+    width: 100%;
+}
+
+.navbar-transparent {
+    background-color: transparent !important;
+    box-shadow: none;
+}
+
+.ski-body ul, .ski-body ol {
+    margin-left: -10px;
+    padding-left: 0;
+}
+
+.content-box {
+    border: 2px solid lightbrown;
+    background-color: #f5f5dc;
+    padding: 20px;
+    border-radius: 5px;
+    margin: 20px auto;
+    width: fit-content;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 30px;
+    color: #4A4E69;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    margin: 20px 0;
+}
+
+button, .button {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 20px;
+    color: #4A4E69;
+    background-color: #f5f5dc;
+    border: 2px solid lightbrown;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    display: inline-block;
+    margin: 10px;
+}
+
+button a {
+    color: #4A4E69;
+    text-decoration: none;
+}
+
+button:hover, .button:hover {
+    background-color: #e0e0d6;
+}

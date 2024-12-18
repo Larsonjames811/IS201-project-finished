@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ski Game</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Link to the new ski_game.css -->
+    <link href="ski_game.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #d0f0f7;
+        }
+        canvas {
+            display: block;
+        }
+        #restartButton, #playButton {
+            display: none;
+            position: absolute;
+            top: 65%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #playButton {
+            display: block;
+        }
+        #welcomeMessage {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #welcomeMessage h1 {
+            font-size: 50px;
+            color: #333;
+            margin: 0;
+        }
+        #welcomeMessage p {
+            font-size: 24px;
+            color: #666;
+            margin: 10px 0 0 0;
+        }
+        /* Additional styles for positioning the button *
+    </style>
+</head>
+<body>
+    <div class="button-container">
+        <button class="go-home-button" onclick="window.location.href='scratch.html'">Go Home</button>
+        <button class="bootstrap-button" onclick="window.open('bootstrap_skipage/index.html', '_blank')">Bootstrap</button>
+    </div>
+
+    <div id="welcomeMessage">
+        <h1>Welcome to the Alpine Skier Game!</h1>
+        <p>Good luck!</p>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <button id="playButton">Play</button>
+    <button id="restartButton">Restart</button>
+
+    <div class="container mt-4">
+        <h1>Welcome to the Ski Game!</h1>
+        <p>Here you can play the ski game.</p>
+        <img src="path/to/your/skier-image.jpg" alt="Skier" class="img-fluid" />
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const restartButton = document.getElementById("restartButton");
+        const playButton = document.getElementById("playButton");
+        const welcomeMessage = document.getElementById("welcomeMessage");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let skier = {
+            x: canvas.width / 2,
+            y: canvas.height - 100,
+            width: 30,
+            height: 50,
+            dx: 0
+        };
+
+        let obstacles = [];
+        let score = 0;
+        let gameOver = false;
+        let obstacleInterval;
+        let obstacleSpeed = 4;
+        let obstacleFrequency = 1500;
+
+        function drawSkier() {
+            // Skier body (jacket)
+            ctx.fillStyle = "#ff0000";
+            ctx.fillRect(skier.x, skier.y, skier.width, skier.height);
+
+            // Skier helmet (from rear view)
+            ctx.fillStyle = "#ffffff"; // White helmet
+            ctx.beginPath();
+            ctx.arc(skier.x + skier.width / 2, skier.y - 15, 15, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Horizontal black stripe on helmet
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(skier.x + skier.width / 2 - 15, skier.y - 18, 30, 6);
+
+            // Skier arms
+            ctx.strokeStyle = "#ff0000";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(skier.x + skier.width / 2, skier.y + 10);
+            ctx.lineTo(skier.x - 15, skier.y + 30);
+            ctx.moveTo(skier.x + skier.width / 2, skier.y + 10);
+            ctx.lineTo(skier.x + skier.width + 15, skier.y + 30);
+            ctx.stroke();
+
+            // Skier poles
+            ctx.strokeStyle = "#000000";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(skier.x - 15, skier.y + 30);
+            ctx.lineTo(skier.x - 25, skier.y + 50);
+            ctx.moveTo(skier.x + skier.width + 15, skier.y + 30);
+            ctx.lineTo(skier.x + skier.width + 25, skier.y + 50);
+            ctx.stroke();
+
+            // Skier skis
+            ctx.strokeStyle = "#1e90ff"; // Bright blue for skis
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(skier.x, skier.y + skier.height);
+            ctx.lineTo(skier.x, skier.y + skier.height + 40);
+            ctx.moveTo(skier.x + skier.width, skier.y + skier.height);
+            ctx.lineTo(skier.x + skier.width, skier.y + skier.height + 40);
+            ctx.stroke();
+        }
+
+        function drawObstacles() {
+            obstacles.forEach(obstacle => {
+                if (obstacle.type === 'tree') {
+                    ctx.fillStyle = "#228B22"; // Green for trees
+                    ctx.beginPath();
+                    ctx.moveTo(obstacle.x + obstacle.width / 2, obstacle.y);
+                    ctx.lineTo(obstacle.x, obstacle.y + obstacle.height);
+                    ctx.lineTo(obstacle.x + obstacle.width, obstacle.y + obstacle.height);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.fillStyle = "#8B4513"; // Brown for tree trunk
+                    ctx.fillRect(obstacle.x + obstacle.width / 3, obstacle.y + obstacle.height, obstacle.width / 3, obstacle.height / 2);
+                } else if (obstacle.type === 'rock') {
+                    ctx.fillStyle = "#808080"; // Gray for rocks
+                    ctx.beginPath();
+                    ctx.ellipse(obstacle.x + obstacle.width / 2, obstacle.y + obstacle.height / 2, obstacle.width / 2, obstacle.height / 3, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+        }
+
+        function moveSkier() {
+            skier.x += skier.dx;
+            if (skier.x < 0) skier.x = 0;
+            if (skier.x + skier.width > canvas.width) skier.x = canvas.width - skier.width;
+        }
+
+        function createObstacle() {
+            const size = Math.random() * 50 + 20;
+            const x = Math.random() * (canvas.width - size);
+            const type = Math.random() > 0.5 ? 'tree' : 'rock';
+            obstacles.push({
+                x: x,
+                y: -size,
+                width: size,
+                height: size,
+                type: type
+            });
+        }
+
+        function moveObstacles() {
+            obstacles.forEach(obstacle => {
+                obstacle.y += obstacleSpeed;
+            });
+
+            obstacles = obstacles.filter(obstacle => obstacle.y < canvas.height);
+        }
+
+        function detectCollision() {
+            obstacles.forEach(obstacle => {
+                if (
+                    skier.x < obstacle.x + obstacle.width &&
+                    skier.x + skier.width > obstacle.x &&
+                    skier.y < obstacle.y + obstacle.height &&
+                    skier.y + skier.height > obstacle.y
+                ) {
+                    gameOver = true;
+                }
+            });
+        }
+
+        function drawCenteredText(text, yPosition, fontSize, color) {
+            ctx.font = `${fontSize}px Arial`;
+            ctx.fillStyle = color;
+            const textWidth = ctx.measureText(text).width;
+            ctx.fillText(text, (canvas.width - textWidth) / 2, yPosition);
+        }
+
+        function drawScore() {
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "#000";
+            ctx.fillText(`Score: ${score}`, 10, 30);
+        }
+
+        function updateScore() {
+            score++;
+            if (score % 200 === 0) {
+                obstacleSpeed += 1;
+                obstacleFrequency = Math.max(500, obstacleFrequency - 100);
+                clearInterval(obstacleInterval);
+                obstacleInterval = setInterval(createObstacle, obstacleFrequency);
+            }
+        }
+
+        function gameLoop() {
+            if (gameOver) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawCenteredText("Game Over", canvas.height / 2 - 50, 50, "#ff0000");
+                drawCenteredText(`Your Score: ${score}`, canvas.height / 2, 30, "#000");
+                restartButton.style.display = "block";
+                clearInterval(obstacleInterval);
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawSkier();
+            moveSkier();
+
+            drawObstacles();
+            moveObstacles();
+            detectCollision();
+
+            drawScore();
+            updateScore();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function startGame() {
+            skier.x = canvas.width / 2;
+            skier.y = canvas.height - 100;
+            skier.dx = 0;
+            obstacles = [];
+            score = 0;
+            gameOver = false;
+            obstacleSpeed = 4;
+            obstacleFrequency = 1500;
+            restartButton.style.display = "none";
+            playButton.style.display = "none";
+            welcomeMessage.style.display = "none";
+            obstacleInterval = setInterval(createObstacle, obstacleFrequency);
+            gameLoop();
+        }
+
+        playButton.addEventListener("click", startGame);
+        restartButton.addEventListener("click", startGame);
+
+        window.addEventListener("keydown", e => {
+            if (e.key === "ArrowLeft") skier.dx = -5;
+            if (e.key === "ArrowRight") skier.dx = 5;
+        });
+
+        window.addEventListener("keyup", e => {
+            if (e.key === "ArrowLeft" || e.key === "ArrowRight") skier.dx = 0;
+        });
+    </script>
+</body>
+</html>
